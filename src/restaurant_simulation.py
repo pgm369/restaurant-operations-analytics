@@ -111,7 +111,9 @@ def calculate_tables_used(hour, is_weekend):
 def calculate_actual_wait(
     party_size,
     tables_available,
-    staff
+    staff,
+    is_weekend,
+    hour
 ):
 
     wait = 10
@@ -139,66 +141,110 @@ def calculate_actual_wait(
 
     wait += party_size * 3
 
+    #Dinner rush adds operational pressure
+    if hour in [18,19,20]:
+        wait += random.randint(5,15)
 
+    # Weekends tend to have higher demand
+    if is_weekend:
+        wait += random.randint(3, 10)
 
-    # More staff improves operations
-
+    # More staff can reduce wait
     wait -= (staff - 20) * 0.7
 
-
-
-    # Add natural variation
-
-    wait += random.randint(-5,10)
-
-
+    # Natural variation
+    wait += random.randint(-8, 12)
 
     return max(5, round(wait))
 
-def calculate_wait_range(actual_wait):
+def calculate_estimated_wait(
+    party_size,
+    tables_available,
+    staff,
+    is_weekend,
+    hour
+):
+
+    estimated_wait = 10
+
+    # Host sees available capacity
+    if tables_available <= 2:
+        estimated_wait += 40
+
+    elif tables_available <= 5:
+        estimated_wait += 25
+
+    elif tables_available <= 10:
+        estimated_wait += 15
+
+    # Larger parties
+    estimated_wait += party_size * 2
+
+    # Dinner rush
+    if hour in [18, 19, 20]:
+        estimated_wait += 10
+
+    # Weekend demand
+    if is_weekend:
+        estimated_wait += 5
+
+    # Staffing
+    estimated_wait -= (staff - 20) * 0.5
+
+    # Host estimation is not perfect
+    # This represents judgment/uncertainty
+    estimated_wait += random.randint(-5, 10)
+
+    return max(5, round(estimated_wait))
 
 
-    if actual_wait <= 15:
+def calculate_wait_range(estimated_wait):
+
+
+    if estimated_wait <= 15:
 
         return 5,15,"5-15 min"
 
 
-    elif actual_wait <= 30:
+    elif estimated_wait <= 30:
 
         return 15,30,"15-30 min"
 
 
-    elif actual_wait <= 45:
+    elif estimated_wait <= 45:
 
         return 30,45,"30-45 min"
 
 
-    elif actual_wait <= 60:
+    elif estimated_wait <= 60:
 
         return 45,60,"45-60 min"
 
 
-    elif actual_wait <= 75:
+    elif estimated_wait <= 75:
 
         return 60,75,"60-75 min"
 
 
-    elif actual_wait <= 90:
+    elif estimated_wait <= 90:
 
         return 75,90,"75-90 min"
     
 
-    elif actual_wait <= 105:
+    elif estimated_wait <= 105:
     
         return 90,105,"90-105 min"
     
-    elif actual_wait <= 120:
+    elif estimated_wait <= 120:
             
         return 105,120,"105-120 min"
 
-    else:
+    elif estimated_wait <= 135:
 
         return 120,135, "120-135 min"
+
+    else:
+        return 135,150, "135+ min"
 
 def calculate_quote_accuracy(
     actual_wait,
@@ -295,12 +341,20 @@ for party_id in range(1, NUMBER_OF_PARTIES + 1):
     actual_wait = calculate_actual_wait(
         party_size,
         tables_available,
-        staff
+        staff,
+        is_weekend,
+        hour
     )
+
+    estimated_wait = calculate_estimated_wait(party_size,
+                                              tables_available,
+                                              staff,
+                                              is_weekend,
+                                              hour)
 
 
     quote_lower, quote_upper, quote_range = calculate_wait_range(
-        actual_wait
+        estimated_wait
     )
 
 
