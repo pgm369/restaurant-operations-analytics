@@ -2,7 +2,7 @@ import pandas as pd
 import random
 from datetime import datetime, timedelta
 
-NUMBER_OF_PARTIES = 200
+NUMBER_OF_PARTIES = 1000
 
 TABLE_CAPACITY = 47
 
@@ -365,7 +365,7 @@ for party_id in range(1, NUMBER_OF_PARTIES + 1):
     )
 
 
-    wait_category = categorize_wait(
+    actual_quote_range = categorize_wait(
         actual_wait
     )
 
@@ -394,7 +394,7 @@ for party_id in range(1, NUMBER_OF_PARTIES + 1):
 
         actual_wait,
 
-        wait_category,
+        actual_quote_range,
 
         quote_accuracy
 
@@ -433,7 +433,7 @@ df = pd.DataFrame(
 
         "actual_wait",
 
-        "wait_category",
+        "actual_quote_range",
 
         "quote_accuracy"
 
