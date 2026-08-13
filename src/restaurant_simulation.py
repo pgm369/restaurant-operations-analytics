@@ -61,6 +61,13 @@ def generate_party_size():
 
     return random.choice(sizes)
 
+def calculate_large_party(party_size):
+    if party_size < 6:
+        return False
+    else:
+        return True
+    
+
 def generate_reservation():
 
     return random.random() < 0.35
@@ -256,6 +263,7 @@ for party_id in range(1, NUMBER_OF_PARTIES + 1):
 
     party_size = generate_party_size()
 
+    large_party = calculate_large_party(party_size)
 
     reservation = generate_reservation()
 
@@ -317,6 +325,7 @@ for party_id in range(1, NUMBER_OF_PARTIES + 1):
         is_weekend,
 
         party_size,
+        large_party,
         reservation,
 
         staff,
@@ -355,6 +364,7 @@ df = pd.DataFrame(
         "is_weekend",
 
         "party_size",
+        "large_party",
         "reservation",
 
         "staff_on_shift",
